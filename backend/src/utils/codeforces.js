@@ -1,7 +1,8 @@
 import axios from "axios"
-import { getUnixTimestampOneYearAgo } from "./time.js";
+import { getUnixTimestampAgo } from "./time.js";
 import Students from "../models/student.js";
 import StudentContestHistory from "../models/studentContestHistory.js";
+import StudentProblemSolved from "../models/studentProblemSolved.js";
 
 /** 
 * Function to fetch student details from Codeforces and save them to the database
@@ -96,7 +97,7 @@ export async function syncContestHistory(codeforcesHandle){
         for(let i = data.result.length - 1; i >= 0; i--) {
 
             if(data.result[i].ratingUpdateTimeSeconds < lastSyncedUNIX ||
-                data.result[i].ratingUpdateTimeSeconds < getUnixTimestampOneYearAgo()) {
+                data.result[i].ratingUpdateTimeSeconds < getUnixTimestampAgo("1y")) {
                 break; // Stop processing if the contest is older than one year
             }
 
@@ -118,17 +119,71 @@ export async function syncContestHistory(codeforcesHandle){
         }
 
         if(newContests.length > 0){
+            console.log(`Synced ${newContests.length} new contests for ${codeforcesHandle}`);
             await StudentContestHistory.bulkWrite(newContests, { ordered: false });
         }
         else {
-            console.log("No new contests to sync for student:", codeforcesHandle);
+            console.log("No new contests to sync for ", codeforcesHandle);
         }
 
-        await student.updateOne({
-            lastSynced: new Date() 
-        })
-        
     } catch (error) {
         console.error("Error syncing contest history:", error);
     }
 }
+
+/**
+ * Function to sync problem solving data for a student
+ * @param {string} codeforcesHandle - The Codeforces handle of the student
+ * @returns {Promise<void>} - A promise that resolves when the problem solving data is synced
+ */
+export async function syncProblemSolvingData(codeforcesHandle) {
+
+    const student = await Students.findOne({ codeforcesHandle });
+    if (!student) throw new Error("Student not found");
+
+    const lastSynced = student.lastSynced
+    const lastSyncedUNIX = Math.floor(lastSynced.getTime() / 1000);
+
+    try {
+        const { data } = await axios.get(`https://codeforces.com/api/user.status?handle=${codeforcesHandle}&from=1&count=400`);
+        if (data.status !== "OK") {
+            throw new Error("Failed to fetch problem solving data");
+        }
+        const submissions = data.result;
+        const problemsSolved = [];
+        for (let i = 0; i < submissions.length; i++) {
+
+            const submission = submissions[i];
+
+            // break out of the loop if the submission is older than lastSynced OR 90 days ago
+            if (submission.creationTimeSeconds < lastSyncedUNIX ||
+                submission.creationTimeSeconds < getUnixTimestampAgo("90d")) {
+                break; // Stop processing
+            }
+
+            if (submission.verdict === "OK") {
+                problemsSolved.push({
+                    insertOne: {
+                        document: {
+                            studentId: student._id,
+                            solvedDate: new Date(submission.creationTimeSeconds * 1000),
+                            problemRating: submission.problem.rating || 0,
+                        }
+                    }
+                });
+            }
+        }
+
+        if (problemsSolved.length > 0) {
+            console.log(`Synced ${problemsSolved.length} new problems solved by ${codeforcesHandle}`);
+            await StudentProblemSolved.bulkWrite(problemsSolved, { ordered: false });
+        } else {
+            console.log("No new problems solved to sync for ", codeforcesHandle);
+        }
+    }
+    catch (error) {
+        console.error("Error syncing problem solving data:", error);
+    }
+}
+
+
