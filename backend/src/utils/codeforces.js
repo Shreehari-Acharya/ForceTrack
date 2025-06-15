@@ -5,11 +5,11 @@ import StudentContestHistory from "../models/studentContestHistory.js";
 import StudentProblemSolved from "../models/studentProblemSolved.js";
 
 /** 
-* Function to fetch student details from Codeforces and save them to the database
+* Function to fetch and sync student profile from Codeforces and save them to the database
 * @param {string} codeforcesHandle - The Codeforces handle of the student
 * @returns {Promise<void>} - A promise that resolves when the student details are fetched and saved
 */
-export async function getStudentDetails(codeforcesHandle) {
+export async function syncStudentProfile(codeforcesHandle) {
     try {
         const { data } = await axios.get(`https://codeforces.com/api/user.info?handles=${codeforcesHandle}`);
         if (data.status !== "OK" || data.result.length === 0) {
@@ -17,14 +17,19 @@ export async function getStudentDetails(codeforcesHandle) {
         }
 
         const studentData = data.result[0];
-        await Students.create({
-            name: studentData.firstName + " " + studentData.lastName,
-            email: "mock@mock.com", 
-            phoneNumber: "9999999999", 
-            codeforcesHandle: studentData.handle,
-            currentRating: studentData.rating || 0,
-            maxRating: studentData.maxRating || 0
-        });
+        const fullName = `${studentData.firstName || ""} ${studentData.lastName || ""}`.trim();
+
+        await Students.findOneAndUpdate(
+            { codeforcesHandle: studentData.handle },
+            {
+                $set: {
+                    name: fullName || "Unknown",
+                    currentRating: studentData.rating || 0,
+                    maxRating: studentData.maxRating || 0,
+                }
+            },
+            { upsert: true } 
+        );
         console.log("Student details fetched and saved successfully");
     } catch (error) {
         console.error("Error fetching student details:", error);
@@ -151,6 +156,8 @@ export async function syncProblemSolvingData(codeforcesHandle) {
         }
         const submissions = data.result;
         const problemsSolved = [];
+        let foundLatestOkSubmission = false; // Flag to track if we found the latest OK submission
+
         for (let i = 0; i < submissions.length; i++) {
 
             const submission = submissions[i];
@@ -162,6 +169,14 @@ export async function syncProblemSolvingData(codeforcesHandle) {
             }
 
             if (submission.verdict === "OK") {
+                if(!foundLatestOkSubmission) {
+                    // If this is the first OK submission, update the student's lastSubmissionDate
+                    await Students.updateOne(
+                        { codeforcesHandle },
+                        { $set: { lastSubmissionDate: new Date(submission.creationTimeSeconds * 1000) } }
+                    );
+                    foundLatestOkSubmission = true; // Set the flag to true
+                }
                 problemsSolved.push({
                     insertOne: {
                         document: {
@@ -186,4 +201,42 @@ export async function syncProblemSolvingData(codeforcesHandle) {
     }
 }
 
+/**
+ * Function to sync student data including details, contest history, and problem solving data
+ * @param {string} codeforcesHandle - The Codeforces handle of the student
+ * @returns {Promise<void>} - A promise that resolves when all data is synced
+ */
+export async function syncStudentData(codeforcesHandle) {
+    try {
+        const startTime = new Date();
+        await syncStudentDetails(codeforcesHandle);
+        await syncContestHistory(codeforcesHandle);
+        await syncProblemSolvingData(codeforcesHandle);
+        const endTime = new Date();
+        await Students.updateOne(
+            { codeforcesHandle },
+            { $set: { lastSynced: endTime } }
+        );
+        console.log(`Data synced successfully for ${codeforcesHandle} in ${(endTime - startTime) / 1000} seconds`);
+    } catch (error) {
+        console.error("Error syncing student data:", error);
+    }
+}
+
+/**
+ * Function to sync data for all students in the database
+ * This function fetches all students' Codeforces handles and syncs their data
+ * @returns {Promise<void>} - A promise that resolves when all students' data is synced
+ */
+export async function syncAllStudentsData() {
+    try {
+        const students = await Students.find({}, { codeforcesHandle: 1, _id: 0 }).lean();
+        for (const student of students) {
+            await syncStudentData(student.codeforcesHandle);
+        }
+        console.log("All students data synced successfully");
+    } catch (error) {
+        console.error("Error syncing all students data:", error);
+    }
+}
 
