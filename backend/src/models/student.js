@@ -42,7 +42,13 @@ const studentSchema = new Schema({
   disableInactivityEmail: {
     type: Boolean,
     default: false,
-  }
+  },
+
+  lastSubmissionDate: {
+    type: Date,
+    default: null, 
+    index: true, 
+  },
   
 });
 
