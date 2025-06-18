@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Dashboard from "pages/dashboard"
 import StudentDetails from "pages/studentDetails"
 import Navbar from "components/navbar"
+import { Toaster } from "./components/ui/sonner"
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
             </Routes>
           </main>
         </div>
+        <Toaster/>
       </BrowserRouter>
     </ThemeProvider>
   )

@@ -17,13 +17,11 @@ export async function syncStudentProfile(codeforcesHandle) {
         }
 
         const studentData = data.result[0];
-        const fullName = `${studentData.firstName || ""} ${studentData.lastName || ""}`.trim();
 
         await Students.findOneAndUpdate(
             { codeforcesHandle: studentData.handle },
             {
                 $set: {
-                    name: fullName || "Unknown",
                     currentRating: studentData.rating || 0,
                     maxRating: studentData.maxRating || 0,
                 }
@@ -209,7 +207,7 @@ export async function syncProblemSolvingData(codeforcesHandle) {
 export async function syncStudentData(codeforcesHandle) {
     try {
         const startTime = new Date();
-        await syncStudentDetails(codeforcesHandle);
+        await syncStudentProfile(codeforcesHandle);
         await syncContestHistory(codeforcesHandle);
         await syncProblemSolvingData(codeforcesHandle);
         const endTime = new Date();
