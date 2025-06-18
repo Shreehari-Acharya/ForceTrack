@@ -19,7 +19,7 @@ export async function getBasicStudentsInfo(page, limit){
         .sort({ name: 1 }) // default sort by name
         .skip(skip)
         .limit(limit)
-        .select('name email phoneNumber codeforcesHandle currentRating maxRating'), 
+        .select('name email phoneNumber codeforcesHandle currentRating maxRating lastSynced'), 
       Students.countDocuments(),
     ]);
 
