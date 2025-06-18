@@ -1,4 +1,4 @@
-import { createStudent, getBasicStudentsInfo } from "../services/dbServices/studentServices.js";
+import { createStudent, DeleteStudent, getBasicStudentsInfo, getStudentBySearchTerm, updateStudentDetails } from "../services/dbServices/studentServices.js";
 
 /**
  * @desc Get a paginated list of students with basic information
@@ -62,6 +62,102 @@ export async function addNewStudent(req, res) {
         });
     }
 }
+
+export async function findStudent(req, res) {
+    const { searchTerm } = req.query;
+
+    if (!searchTerm) {
+        return res.status(400).json({
+            success: false,
+            message: "Search term is required",
+        });
+    }
+
+    try {
+        const students = await getStudentBySearchTerm(searchTerm);
+        if (students.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No students found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Students fetched successfully",
+            students: students,
+        });
+    } catch (error) {
+        console.error("Error fetching students:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+
+}
+
+export async function updateStudent(req, res){
+    try {
+        const {studentId, name, email, phone} = req.body;
+
+        if(!studentId){
+            return res.status(400).json({
+                success: false,
+                message: "studentId is required"
+            })
+        }
+
+        const updatedData = {
+            name: name,
+            email: email,
+            phoneNumber: phone
+        }
+
+        console.log(updatedData)
+
+        const updatedStudentDetails = await updateStudentDetails(studentId, updatedData);
+
+        return res.status(201).json({
+            success: true,
+            updatedData: updatedStudentDetails
+        })
+    } catch (error) {
+        console.log("error while updating user data:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
+export async function DeleteStudentData(req, res){
+
+    const { studentId } = req.query;
+    try {
+        const success = await DeleteStudent(studentId);
+
+        if(success){
+            return res.status(200).json({
+                success: success,
+                message: "Student deleted successfully!"
+            })
+        }
+        else{
+            return res.status(400).json({
+                success: success,
+                messsage: "Something went wrong"
+            })
+        }
+    } catch (error) {
+        console.error("Error:", error)
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
 
 
 

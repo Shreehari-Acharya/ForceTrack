@@ -1,4 +1,6 @@
 import Students from "../../models/student.js";
+import StudentContestHistory from "../../models/studentContestHistory.js";
+import StudentProblemSolved from "../../models/studentProblemSolved.js";
 
 /*
   * @desc Get a paginated list of students with basic information
@@ -49,5 +51,49 @@ export async function createStudent({ handle, name, email, phone }) {
   } catch (err) {
     console.error("Error creating student:", err);
     throw new Error("Failed to create student");
+  }
+}
+
+export async function getStudentBySearchTerm(searchTerm) {
+  try {
+    const students = await Students.find({
+      $or: [
+        { codeforcesHandle: searchTerm },
+        { email: searchTerm },
+      ]
+    }).select('name email phoneNumber codeforcesHandle currentRating maxRating lastSynced');
+
+    return students;
+  } catch (err) {
+    console.error("Error searching students:", err);
+    throw new Error("Failed to search students");
+  }
+}
+
+export async function updateStudentDetails(studentId, updatedData) {
+  try {
+    const updatedStudent = await Students.findByIdAndUpdate(
+      studentId,
+      updatedData,
+      { new: true }
+    )
+    return updatedStudent;
+  } catch (error) {
+    console.error("ERROR updating the student:", error)
+  }
+}
+
+export async function DeleteStudent(studentId){
+  try {
+    await Promise.all([
+      Students.findByIdAndDelete(studentId),
+      StudentProblemSolved.deleteMany({studentId}),
+      StudentContestHistory.deleteMany({studentId})
+    ])
+
+    return true;
+  } catch (error) {
+    console.error("Error deleting Student:", error);
+    return false;
   }
 }

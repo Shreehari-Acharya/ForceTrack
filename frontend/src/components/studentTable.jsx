@@ -5,65 +5,10 @@ import { Badge } from "@/components/ui/badge"
 import { MoreHorizontal, Edit, Trash2 } from "lucide-react"
 import PaginationForStudentTable from "./pagination"
 import { useNavigate } from "react-router-dom"
+import { useState } from "react"
+import EditStudentDialog from "./dialogs/editStudentDialog"
+import DeleteStudentDialog from "./dialogs/deleteStudentDialog"
 
-
-// Mock data based on your structure
-const mockStudents = [
-  {
-    _id: "684e5a7af4cd2c999120e930",
-    name: "Riku Kawasaki",
-    email: "shreehari.acharya.06@gmail.com",
-    phoneNumber: "9999999999",
-    codeforcesHandle: "maroonrk",
-    currentRating: 3565,
-    maxRating: 3650,
-  },
-  {
-    _id: "684e5a7af4cd2c999120e931",
-    name: "Alice Johnson",
-    email: "alice.johnson@example.com",
-    phoneNumber: "8888888888",
-    codeforcesHandle: "alice_codes",
-    currentRating: 2100,
-    maxRating: 2250,
-  },
-  {
-    _id: "684e5a7af4cd2c999120e932",
-    name: "Bob Smith",
-    email: "bob.smith@example.com",
-    phoneNumber: "7777777777",
-    codeforcesHandle: "bob_solver",
-    currentRating: 1850,
-    maxRating: 1900,
-  },
-  {
-    _id: "684e5a7af4cd2c999120e933",
-    name: "Carol Davis",
-    email: "carol.davis@example.com",
-    phoneNumber: "6666666666",
-    codeforcesHandle: "carol_dev",
-    currentRating: 1650,
-    maxRating: 1750,
-  },
-  {
-    _id: "684e5a7af4cd2c999120e934",
-    name: "David Wilson",
-    email: "david.wilson@example.com",
-    phoneNumber: "5555555555",
-    codeforcesHandle: "david_algo",
-    currentRating: 2300,
-    maxRating: 2400,
-  },
-  {
-    _id: "684e5a7af4cd2c999120e935",
-    name: "Eva Brown",
-    email: "eva.brown@example.com",
-    phoneNumber: "4444444444",
-    codeforcesHandle: "eva_competitive",
-    currentRating: 1950,
-    maxRating: 2050,
-  },
-]
 
 export default function StudentsTable({
   students,
@@ -74,18 +19,28 @@ export default function StudentsTable({
   ...props
 }) {
   const navigate = useNavigate()
+  const [allStudents, setAllStudents] = useState(students)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [studentForEdit, setStudentForEdit] = useState(null)
+  const [studentForDelete, setStudentForDelete] = useState(null)
+  const [indexForDelete, setIndexForDelete] = useState(-1)
+
   const handleRowClick = (studentId) => {
     navigate(`/${studentId}`)
   }
 
-  const handleEdit = (studentId, e) => {
+  const handleEdit = (student, e) => {
     e.stopPropagation()
-    console.log("Edit student:", studentId)
+    setStudentForEdit(student);
+    setEditDialogOpen(true)
   }
 
-  const handleDelete = (studentId, e) => {
+  const handleDelete = (student, e, index) => {
     e.stopPropagation()
-    console.log("Delete student:", studentId)
+    setIndexForDelete(index)
+    setStudentForDelete(student)
+    setDeleteDialogOpen(true)
   }
 
   const getRatingColor = (rating) => {
@@ -97,12 +52,22 @@ export default function StudentsTable({
     return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
   }
 
-  const startIndex = (currentPage - 1) * students.length + 1
-  const endIndex = startIndex + students.length - 1
+  if(allStudents.length === 0) {
+    return (
+      <div className="w-full p-4 text-center text-gray-500">
+        No students found.
+      </div>
+    )
+  }
+
+  const startIndex = (currentPage - 1) * allStudents.length + 1
+  const endIndex = startIndex + allStudents.length - 1
 
   return (
     <div className="w-full" {...props}>
       <div className="rounded-lg border">
+        <EditStudentDialog state={editDialogOpen} onStateChange={setEditDialogOpen} student={studentForEdit}/>
+        <DeleteStudentDialog index={indexForDelete} student={studentForDelete} state={deleteDialogOpen} onStateChange={setDeleteDialogOpen} setStudents={setAllStudents}/>
         <Table>
           <TableHeader>
             <TableRow>
@@ -116,7 +81,7 @@ export default function StudentsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {students.map((student) => (
+            {allStudents.map((student, index) => (
               <TableRow
                 key={student._id}
                 className="cursor-pointer hover:bg-muted/50"
@@ -158,11 +123,11 @@ export default function StudentsTable({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={(e) => handleEdit(student._id, e)}>
+                      <DropdownMenuItem onClick={(e) => handleEdit(student, e)}>
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e) => handleDelete(student._id, e)} className="text-red-600">
+                      <DropdownMenuItem onClick={(e) => handleDelete(student, e, index)} className="text-red-600">
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
                       </DropdownMenuItem>
