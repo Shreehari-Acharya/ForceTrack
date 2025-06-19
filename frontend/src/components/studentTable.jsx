@@ -27,7 +27,7 @@ export default function StudentsTable({
   const [indexForDelete, setIndexForDelete] = useState(-1)
 
   const handleRowClick = (studentId) => {
-    navigate(`/${studentId}`)
+    navigate(`/student/${studentId}`)
   }
 
   const handleEdit = (student, e) => {

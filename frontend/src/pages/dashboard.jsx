@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import axios from "axios";
-import RowSelector from "@/components/rowSelector";
+import RowSelector from "@/components/customSelectors";
 import Loader from "@/components/loadingCircle";
 
 export default function Dashboard() {
