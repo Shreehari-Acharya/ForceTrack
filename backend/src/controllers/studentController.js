@@ -158,6 +158,42 @@ export async function DeleteStudentData(req, res){
     }
 }
 
+export async function downloadStudentData(req, res) {
+
+    try {
+        const allStudents = await getBasicStudentsInfo(1,1, true);
+        if (allStudents.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No students found"
+            });
+        }
+        console.log(allStudents)
+        const csvData = allStudents.map(student => ({
+            "Codeforces Handle": student.codeforcesHandle,
+            "Name": student.name,
+            "Email": student.email,
+            "Phone": student.phoneNumber,
+            "Current Rating": student.currentRating,
+            "Max Rating": student.maxRating,
+            "Last Synced": student.lastSynced ? student.lastSynced.toISOString() : "Never Synced"
+        }));
+        const csvHeader = Object.keys(csvData[0]).join(",") + "\n";
+        const csvRows = csvData.map(row => Object.values(row).join(",")).join("\n");
+        const csvContent = csvHeader + csvRows;
+
+        res.setHeader("Content-Type", "text/csv");
+        res.setHeader("Content-Disposition", "attachment; filename=students.csv");
+        res.status(200).send(csvContent);
+    } catch (error) {
+        console.error("Error downloading student data:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+}
+
 
 
 

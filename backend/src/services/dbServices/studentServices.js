@@ -11,7 +11,19 @@ import StudentProblemSolved from "../../models/studentProblemSolved.js";
   * @returns {Object} - An object containing the list of students, total count,
   * current page, and total pages
   */
-export async function getBasicStudentsInfo(page, limit){
+export async function getBasicStudentsInfo(page, limit, getAll = false) {
+
+  if (getAll) {
+    try {
+      const students = await Students.find()
+        .sort({ name: 1 }) // default sort by name
+        .select('name email phoneNumber codeforcesHandle currentRating maxRating lastSynced');
+      return students;
+    } catch (err) {
+      console.error("Error fetching all students:", err);
+      throw new Error("Failed to fetch all students");
+    }
+  }
     
     const skip = (page - 1) * limit;
     
