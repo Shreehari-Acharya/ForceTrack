@@ -17,7 +17,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendEmail(recipient) {
     try {
         await resend.emails.send({
-            from: "onboarding@resend.dev",
+            from: process.env.EMAIL_FROM || "onboarding@resend.dev",
             to: recipient,
             subject: "No submissions from past few days :(",
             html: `

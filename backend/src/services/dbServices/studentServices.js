@@ -2,14 +2,15 @@ import Students from "../../models/student.js";
 import StudentContestHistory from "../../models/studentContestHistory.js";
 import StudentProblemSolved from "../../models/studentProblemSolved.js";
 
-/*
+/** 
   * @desc Get a paginated list of students with basic information
   * @route GET /api/students
   * @access Public
   * @param {number} page - The current page number
   * @param {number} limit - The number of students per page
-  * @returns {Object} - An object containing the list of students, total count,
-  * current page, and total pages
+  * @param {boolean} getAll - If true, fetches all students without pagination
+  * @return {Promise<Object>} - A promise that resolves to an object containing the list of students, total count, current page, and total pages
+  * @throws {Error} - Throws an error if there is an issue fetching students
   */
 export async function getBasicStudentsInfo(page, limit, getAll = false) {
 
@@ -49,6 +50,18 @@ export async function getBasicStudentsInfo(page, limit, getAll = false) {
   }
 };
 
+/**
+ * @desc Add a new student to the database
+ * @route POST /api/students
+ * @access Public
+ * @param {Object} studentData - The student details to be added
+ * @param {string} studentData.handle - The Codeforces handle of the student
+ * @param {string} studentData.name - The name of the student
+ * @param {string} studentData.email - The email address of the student
+ * @param {string} studentData.phone - The phone number of the student
+ * @returns {Promise<void>} - A promise that resolves when the student is created
+ * @throws {Error} - Throws an error if there is an issue creating the student
+ */
 export async function createStudent({ handle, name, email, phone }) {
   try {
     Students.create({
@@ -66,6 +79,14 @@ export async function createStudent({ handle, name, email, phone }) {
   }
 }
 
+/**
+ * @desc Search for students by a search term
+ * @route GET /api/students/search
+ * @access Public
+ * @param {string} searchTerm - The term to search for in student handles or emails
+ * @returns {Promise<Array>} - A promise that resolves to an array of students matching the search term
+ * @throws {Error} - Throws an error if there is an issue searching for students
+ */
 export async function getStudentBySearchTerm(searchTerm) {
   try {
     const students = await Students.find({
@@ -82,6 +103,18 @@ export async function getStudentBySearchTerm(searchTerm) {
   }
 }
 
+/**
+ * @desc Update student details
+ * @route PUT /api/students/
+ * @access Public
+ * @param {string} studentId - The ID of the student to update
+ * @param {Object} updatedData - The data to update the student with
+ * @param {string} updatedData.name - The new name of the student
+ * @param {string} updatedData.email - The new email of the student
+ * @param {string} updatedData.phone - The new phone number of the student
+ * @returns {Promise<Object>} - A promise that resolves to the updated student object
+ * @throws {Error} - Throws an error if there is an issue updating the student
+ */
 export async function updateStudentDetails(studentId, updatedData) {
   try {
     const updatedStudent = await Students.findByIdAndUpdate(
@@ -95,6 +128,14 @@ export async function updateStudentDetails(studentId, updatedData) {
   }
 }
 
+/**
+ * @desc Delete a student and their related data
+ * @route DELETE /api/students/
+ * @access Public
+ * @param {string} studentId - The ID of the student to delete
+ * @returns {Promise<boolean>} - A promise that resolves to true if the student was deleted, false otherwise
+ * @throws {Error} - Throws an error if there is an issue deleting the student
+ */
 export async function DeleteStudent(studentId){
   try {
     await Promise.all([
@@ -110,6 +151,14 @@ export async function DeleteStudent(studentId){
   }
 }
 
+/**
+ * @desc Get complete student data including contest history and problems solved
+ * @route GET /api/students/s/:studentId
+ * @access Public
+ * @param {string} studentId - The ID of the student to fetch data for
+ * @return {Promise<Object>} - A promise that resolves to an object containing the student data, contest history, and problems solved
+ * @throws {Error} - Throws an error if there is an issue fetching the complete student data
+ */
 export async function getCompleteStudentData(studentId) {
   try {
     const student = await Students.findById(studentId)

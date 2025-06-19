@@ -63,6 +63,14 @@ export async function addNewStudent(req, res) {
     }
 }
 
+/**
+ * @desc Find students by a search term
+ * @route GET /api/students/search
+ * @access Public
+ * @param {Object} req - The request object containing the search term in the query parameters
+ * @param {Object} res - The response object to send the result
+ * @returns {Object} - A JSON response containing the list of students matching the search term
+ */
 export async function findStudent(req, res) {
     const { searchTerm } = req.query;
 
@@ -97,6 +105,14 @@ export async function findStudent(req, res) {
 
 }
 
+/**
+ * @desc Update a student's details
+ * @route PUT /api/students
+ * @access Public
+ * @param {Object} req - The request object containing the student ID and updated details in the body
+ * @param {Object} res - The response object to send the result
+ * @returns {Object} - A JSON response indicating success or failure of the update operation
+ */
 export async function updateStudent(req, res){
     try {
         const {studentId, name, email, phone} = req.body;
@@ -131,6 +147,14 @@ export async function updateStudent(req, res){
     }
 }
 
+/**
+ * @desc Delete a student by their ID
+ * @route DELETE /api/students/
+ * @access Public
+ * @param {Object} req - The request object containing the student ID in the query parameters
+ * @param {Object} res - The response object to send the result
+ * @returns {Object} - A JSON response indicating success or failure of the deletion
+ */
 export async function DeleteStudentData(req, res){
 
     const { studentId } = req.query;
@@ -158,6 +182,14 @@ export async function DeleteStudentData(req, res){
     }
 }
 
+/**
+ * @desc Download student data as a CSV file
+ * @route GET /api/students/download
+ * @access Public
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object to send the CSV file
+ * @returns {void} - Sends a CSV file containing student data
+ */
 export async function downloadStudentData(req, res) {
 
     try {
@@ -194,6 +226,14 @@ export async function downloadStudentData(req, res) {
     }
 }
 
+/**
+ * @desc Get complete details of a student by their ID
+ * @route GET /api/students/s/:studentId
+ * @access Public
+ * @param {Object} req - The request object containing the student ID in the URL parameters
+ * @param {Object} res - The response object to send the result
+ * @returns {Object} - A JSON response containing the student's details or an error message
+ */
 export async function getStudentDetails(req, res) {
     const { studentId } = req.params;
 
