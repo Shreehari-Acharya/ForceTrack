@@ -109,3 +109,37 @@ export async function DeleteStudent(studentId){
     return false;
   }
 }
+
+export async function getCompleteStudentData(studentId) {
+  try {
+    const student = await Students.findById(studentId)
+      .select('name email phoneNumber codeforcesHandle currentRating maxRating lastSynced');
+
+    if (!student) {
+      throw new Error("Student not found");
+    }
+
+    const now = new Date();
+    const nintyDaysAgo = new Date(now.setDate(now.getDate() - 90));
+    const oneYearAgo = new Date(now.setFullYear(now.getFullYear() - 1));
+    
+    
+
+    const contestHistory = await StudentContestHistory.find({ studentId, date: { $gte: oneYearAgo } })
+      .sort({ date: -1 }
+      
+      );
+
+    const problemsSolved = await StudentProblemSolved.find({ studentId, solvedDate: { $gte: nintyDaysAgo } })
+      .sort({ solvedDate: -1 });
+
+    return {
+      student,
+      contestHistory,
+      problemsSolved,
+    };
+  } catch (error) {
+    console.error("Error fetching complete student data:", error);
+    throw new Error("Failed to fetch complete student data");
+  }
+}

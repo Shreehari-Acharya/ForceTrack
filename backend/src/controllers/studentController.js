@@ -1,4 +1,4 @@
-import { createStudent, DeleteStudent, getBasicStudentsInfo, getStudentBySearchTerm, updateStudentDetails } from "../services/dbServices/studentServices.js";
+import { createStudent, DeleteStudent, getBasicStudentsInfo, getCompleteStudentData, getStudentBySearchTerm, updateStudentDetails } from "../services/dbServices/studentServices.js";
 
 /**
  * @desc Get a paginated list of students with basic information
@@ -187,6 +187,39 @@ export async function downloadStudentData(req, res) {
         res.status(200).send(csvContent);
     } catch (error) {
         console.error("Error downloading student data:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+}
+
+export async function getStudentDetails(req, res) {
+    const { studentId } = req.params;
+
+    if (!studentId) {
+        return res.status(400).json({
+            success: false,
+            message: "Student ID is required",
+        });
+    }
+
+    try {
+        const studentData = await getCompleteStudentData(studentId);
+        if (!studentData) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Student details fetched successfully",
+            student: studentData,
+        });
+    } catch (error) {
+        console.error("Error fetching student details:", error);
         res.status(500).json({
             success: false,
             message: "Internal server error",
