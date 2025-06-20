@@ -94,10 +94,10 @@ export default function Dashboard() {
               currentPage={page}
               totalPages={StudentDetails.totalPages}
               onPageChange={handlePageChange}
-              startIndex={page === 1 ? 1 : (page - 1) * rowsPerPage + 1}
+              startIndex={StudentDetails.page === 1 ? 1 : (StudentDetails.page - 1) * rowsPerPage + 1}
               endIndex={ StudentDetails.data.length < rowsPerPage ?
-                (page - 1) * rowsPerPage + StudentDetails.data.length :
-                page * rowsPerPage}
+                (StudentDetails.page - 1) * rowsPerPage + StudentDetails.data.length :
+                StudentDetails.page * rowsPerPage}
           />
     </div>
   );
