@@ -3,19 +3,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { MoreHorizontal, Edit, Trash2 } from "lucide-react"
-import PaginationForStudentTable from "./pagination"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import EditStudentDialog from "./dialogs/editStudentDialog"
 import DeleteStudentDialog from "./dialogs/deleteStudentDialog"
 
 
 export default function StudentsTable({
   students,
-  total,
-  currentPage,
-  totalPages,
-  onPageChange,
   ...props
 }) {
   const navigate = useNavigate()
@@ -43,6 +38,10 @@ export default function StudentsTable({
     setDeleteDialogOpen(true)
   }
 
+  useEffect(() => {
+    setAllStudents(students)
+  }, [students])
+
   const getRatingColor = (rating) => {
     if (rating >= 3000) return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
     if (rating >= 2400) return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
@@ -59,9 +58,6 @@ export default function StudentsTable({
       </div>
     )
   }
-
-  const startIndex = (currentPage - 1) * allStudents.length + 1
-  const endIndex = startIndex + allStudents.length - 1
 
   return (
     <div className="w-full" {...props}>
@@ -139,14 +135,6 @@ export default function StudentsTable({
           </TableBody>
         </Table>
       </div>
-
-          <PaginationForStudentTable total={total}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-              startIndex={startIndex}
-              endIndex={endIndex}
-          />
     </div>
   )
 }

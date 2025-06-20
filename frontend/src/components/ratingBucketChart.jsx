@@ -37,6 +37,20 @@ const chartConfig = {
 } 
 
 export function RatingBucketBarChart({data, days}) {
+  console.log("RatingBucketBarChart data", data)
+  if(!Array.isArray(data)) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className={"text-3xl"}> No data available</CardTitle>
+          <CardDescription className={"text-lg"}>Last {days} days</CardDescription>
+        </CardHeader>
+        <CardContent className="text-center text-gray-500">
+          No problems solved in the last {days} days.
+        </CardContent>
+      </Card>
+    )
+  }
   return (
     <Card>
       <CardHeader>

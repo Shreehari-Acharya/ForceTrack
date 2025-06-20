@@ -93,7 +93,7 @@ export default function ProblemSolvingDetails({ problemDetails }) {
             />
             <div className="w-full flex flex-col md:flex-row gap-10 mt-4 items-start">
                 <div className="w-5/12">
-                <RatingBucketBarChart data={stats.ratingBuckets} days={filter} />
+                <RatingBucketBarChart data={stats.ratingBuckets || []} days={filter} />
             </div>
             <div className="w-auto h-5">
                 <ProblemHeatmap problemDetails={filteredProblems} days={filter} />

@@ -3,6 +3,7 @@ import { BarChart3, Calendar, Target, TrendingUp } from "lucide-react";
 
 
 export default function ProblemSolvingStats({total, averageRating, harderProblem, averageNumberOfProblems }) {
+  console.log(harderProblem)
     return (
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card>
@@ -38,7 +39,7 @@ export default function ProblemSolvingStats({total, averageRating, harderProblem
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{harderProblem.problemRating}</div>
+                  <div className="text-2xl font-bold">{harderProblem?.problemRating || 0}</div>
                 </CardContent>
               </Card>
             </div>
