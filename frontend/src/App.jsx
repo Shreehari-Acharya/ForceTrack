@@ -4,6 +4,7 @@ import Dashboard from "pages/dashboard"
 import StudentDetails from "pages/studentDetails"
 import Navbar from "components/navbar"
 import { Toaster } from "./components/ui/sonner"
+import Settings from "./pages/settings"
 
 function App() {
 
@@ -16,10 +17,11 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/student/:id" element={<StudentDetails />} />
+              <Route path="/settings" element={<Settings/>} />
             </Routes>
           </main>
+          <Toaster/>
         </div>
-        <Toaster/>
       </BrowserRouter>
     </ThemeProvider>
   )

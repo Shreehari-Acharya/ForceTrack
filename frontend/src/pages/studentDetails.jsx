@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 
 export default function StudentDetails() {
   const { id } = useParams();
-  const [student, setStudent] = useState(mockResponse);
+  const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
