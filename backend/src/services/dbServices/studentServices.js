@@ -162,7 +162,7 @@ export async function DeleteStudent(studentId){
 export async function getCompleteStudentData(studentId) {
   try {
     const student = await Students.findById(studentId)
-      .select('name email phoneNumber codeforcesHandle currentRating maxRating lastSynced');
+      .select('name email phoneNumber codeforcesHandle currentRating maxRating lastSynced inactivityReminderCount disableInactivityEmail');
 
     if (!student) {
       throw new Error("Student not found");
@@ -190,5 +190,23 @@ export async function getCompleteStudentData(studentId) {
   } catch (error) {
     console.error("Error fetching complete student data:", error);
     throw new Error("Failed to fetch complete student data");
+  }
+}
+
+export async function toggleEmailNotification(studentId) {
+  try {
+    const student = await Students.findById(studentId);
+
+    if (!student) {
+      throw new Error("Student not found");
+    }
+
+    student.disableInactivityEmail = !student.disableInactivityEmail;
+    await student.save();
+
+    return true;
+  } catch (error) {
+    console.error("Error updating email notification setting:", error);
+    throw new Error("Failed to update email notification setting");
   }
 }

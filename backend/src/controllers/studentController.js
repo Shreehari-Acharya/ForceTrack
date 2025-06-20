@@ -1,4 +1,4 @@
-import { createStudent, DeleteStudent, getBasicStudentsInfo, getCompleteStudentData, getStudentBySearchTerm, updateStudentDetails } from "../services/dbServices/studentServices.js";
+import { createStudent, DeleteStudent, getBasicStudentsInfo, getCompleteStudentData, getStudentBySearchTerm, toggleEmailNotification, updateStudentDetails } from "../services/dbServices/studentServices.js";
 
 /**
  * @desc Get a paginated list of students with basic information
@@ -260,6 +260,39 @@ export async function getStudentDetails(req, res) {
         });
     } catch (error) {
         console.error("Error fetching student details:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+}
+
+export async function updateEmailNotification(req, res) {
+    const { studentId } = req.body;
+
+    if (!studentId) {
+        return res.status(400).json({
+            success: false,
+            message: "Student ID required",
+        });
+    }
+
+    try {
+        const success = await toggleEmailNotification(studentId)
+
+        if (!success) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Email notification status updated successfully",
+        });
+    } catch (error) {
+        console.error("Error updating email notification status:", error);
         res.status(500).json({
             success: false,
             message: "Internal server error",

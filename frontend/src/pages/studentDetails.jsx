@@ -1,7 +1,6 @@
 import ContestHistory from '@/components/contestHistory';
-import RatingTrendChart from '@/components/contestHistory';
-import ContestTable from '@/components/contestTable';
 import ProblemSolvingDetails from '@/components/problemSolvingDetails';
+import StudentInfoCard from '@/components/studentInfoCard';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -50,8 +49,9 @@ export default function StudentDetails() {
   }
 
   return (
-    <div className="min-h-screen">
-      <main className="mt-8">
+    <div className="min-h-screen flex flex-col items-center w-full">
+      <StudentInfoCard student={student?.student} />
+      <main className="mt-2 w-10/12">
         <ContestHistory ContestHistory={student?.contestHistory || []} />
         <ProblemSolvingDetails problemDetails={student?.problemsSolved || []} />
       </main>

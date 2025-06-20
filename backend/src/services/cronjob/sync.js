@@ -22,11 +22,18 @@ export function updateCronJobTimings(cronExpression) {
         try {
             const now = new Date();
             console.log(`Cron job started at ${now.toISOString()}`);
-            await Settings.updateOne({}, { isCronRunning: true, totalTimeTaken: 0 }); // Update cron running status
+            const settings = await Settings.findOneAndUpdate(
+                {},
+                { isCronRunning: true, totalTimeTaken: 0 }, 
+                { new: true } // returns the updated document
+            ); 
 
             await syncAllStudentsData(); // Sync all students' data
-            await sendGetbackToSolvingEmails(); // Send emails to inactive students
 
+            if(settings.emailNotificationEnabled){
+                await sendGetbackToSolvingEmails(); // Send emails to inactive students
+            }
+            
             const end = new Date();
             console.log(`Cron job completed at ${end.toISOString()}`);
 
