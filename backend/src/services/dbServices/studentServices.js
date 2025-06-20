@@ -64,7 +64,7 @@ export async function getBasicStudentsInfo(page, limit, getAll = false) {
  */
 export async function createStudent({ handle, name, email, phone }) {
   try {
-    Students.create({
+    await Students.create({
       codeforcesHandle: handle,
       name,
       email,

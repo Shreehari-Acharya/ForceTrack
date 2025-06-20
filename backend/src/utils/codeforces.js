@@ -211,7 +211,7 @@ export async function syncStudentData(codeforcesHandle) {
         await syncContestHistory(codeforcesHandle);
         await syncProblemSolvingData(codeforcesHandle);
         const endTime = new Date();
-        await Students.updateOne(
+        await Students.findOneAndUpdate(
             { codeforcesHandle },
             { $set: { lastSynced: endTime } }
         );
