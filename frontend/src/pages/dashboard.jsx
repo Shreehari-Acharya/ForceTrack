@@ -7,6 +7,7 @@ import { FiDownload } from "react-icons/fi";
 import axios from "axios";
 import RowSelector from "@/components/customSelectors";
 import Loader from "@/components/loadingCircle";
+import PaginationForStudentTable from "@/components/pagination";
 
 export default function Dashboard() {
   const [page, setPage] = useState(1);
@@ -32,6 +33,7 @@ export default function Dashboard() {
   };
 
   const handleStudentListUpdate = (students) => {
+    
     setStudentDetails({
       data: students,
       total: students.length,
@@ -48,7 +50,9 @@ export default function Dashboard() {
     const fetchStudentDetails = async () => {
       try {
         const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/students?page=${page}&limit=${rowsPerPage}`);
+        console.log(data);
         setStudentDetails(data);
+        console.log("Fetched student details:", data);
       } catch (error) {
         console.error("Error fetching student details:", error);
         setStudentDetails(null);
@@ -58,6 +62,13 @@ export default function Dashboard() {
     fetchStudentDetails();
   }, [page, rowsPerPage]);
 
+  if(!StudentDetails) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader message={"Fetching student details"}/>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col space-y-8 p-8">
@@ -77,14 +88,17 @@ export default function Dashboard() {
           <AddNewStudentDialog/>
         </div>
       </header>
-      {StudentDetails ? (<StudentsTable className="space-y-8"
-        students={StudentDetails.data} 
-        total={StudentDetails.total}
-        totalPages={StudentDetails.totalPages}
-        currentPage={StudentDetails.page}
-        onPageChange={handlePageChange} />) : (
-          <Loader message={"Fetching student details"}/>
-      )}
+      <StudentsTable className="space-y-8"
+        students={StudentDetails.data}  />
+      <PaginationForStudentTable total={StudentDetails.total}
+              currentPage={page}
+              totalPages={StudentDetails.totalPages}
+              onPageChange={handlePageChange}
+              startIndex={page === 1 ? 1 : (page - 1) * rowsPerPage + 1}
+              endIndex={ StudentDetails.data.length < rowsPerPage ?
+                (page - 1) * rowsPerPage + StudentDetails.data.length :
+                page * rowsPerPage}
+          />
     </div>
   );
 }
