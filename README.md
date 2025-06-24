@@ -1,7 +1,7 @@
 
-# 📊 TLE Analytics
+# 📊 ForceTrack
 
-**TLE Analytics** A platform for tracking and visualizing the competitive programming progress of students using their Codeforces activity. It includes powerful analytics, clean UI, and automation to sync data regularly
+**ForceTrack** A platform for tracking and visualizing the competitive programming progress of students using their Codeforces activity. It includes powerful analytics, clean UI, and automation to sync data regularly
 
 ---
 
@@ -14,7 +14,7 @@
 ## Monorepo Structure
 
 ```
-TLE-Analytics/
+ForceTrack/
 ├── frontend/    → React app for UI (dashboard, analytics, charts)
 ├── backend/     → REST API for student management and data sync
 ```
@@ -52,8 +52,8 @@ See [backend/README.md](./backend/README.md) for API docs and server setup.
 ### Clone the Repo
 
 ```bash
-git clone https://github.com/your-username/tle-analytics.git
-cd tle-analytics
+git clone https://github.com/your-username/ForceTrack.git
+cd ForceTrack
 ```
 
 ### Install Dependencies

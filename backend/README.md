@@ -1,6 +1,6 @@
-#  TLE Analytics Backend
+#  ForceTrack Backend
 
-This is the backend service for **TLE Analytics**, a platform for tracking and analyzing Codeforces student progress. It provides a RESTful API for managing students, syncing Codeforces data, and delivering analytics to the frontend.
+This is the backend service for **ForceTrack**, a platform for tracking and analyzing Codeforces student progress. It provides a RESTful API for managing students, syncing Codeforces data, and delivering analytics to the frontend.
 
 ---
 
@@ -55,16 +55,20 @@ backend/
 └── src/
     ├── server.js                    # Entry point (Express app)
     ├── controllers/
-    │   └── studentController.js     # Route handler logic
+    │   └── studentController.js     # StudentRoute handler logic
+    |   └── settingsController.js    # SettingsRoute handler logic
     ├── models/
+        ├── settings.js
     │   ├── student.js
     │   ├── studentContestHistory.js
     │   └── studentProblemSolved.js
     ├── routes/
     │   └── studentRoutes.js         # All /api/students routes
+        └── settingsRoutes.js        # All /api/settings routes
     ├── services/
     │   ├── cronjob/
     │   │   └── sync.js              # Scheduled batch sync logic
+    |   |   └── syncOperation.js     # Actual function for Sync
     │   ├── dbServices/
     │   │   └── studentServices.js   # MongoDB interaction logic
     │   └── email/
@@ -72,6 +76,7 @@ backend/
     │       └── sendEmails.js        # Email logic (e.g., inactivity)
     └── utils/
         ├── codeforces.js            # Codeforces API wrapper
+        ├── seed.js                  # Seed the database with few random codeforces handle
         └── time.js                  # Date/time utility functions
 ```
 

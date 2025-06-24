@@ -1,7 +1,7 @@
 
-# TLE - Analytics Frontend
+# ForceTrack Frontend
 
-**TLE - Analytics** is a student progress tracker and analytics dashboard for Codeforces users. It provides a modern, responsive UI to view, manage, and analyze competitive programming data of students.
+**ForceTrack** is a student progress tracker and analytics dashboard for Codeforces users. It provides a modern, responsive UI to view, manage, and analyze competitive programming data of students.
 
 ---
 
@@ -78,7 +78,7 @@ frontend/
 ###  Prerequisites
 
 * Node.js **v18+**
-* Backend server running (see [TLE Backend README](../backend/README.md))
+* Backend server running (see [ForceTrack Backend README](../backend/README.md))
 
 ###  Installation
 
